@@ -1,23 +1,52 @@
+import os
+import sys
 import operator
 import requests
-s=requests.Session()
-ips = []
-d = {}
-with open("ips.txt","r") as f:
-   for i in f:
-       ips.append(i.strip())
 
-for ip in ips:
-    try:
-        r=s.get("http://"+ip+"/ray", headers={"Host":"localhoster.ml"},timeout=0.4)
-        print(r,r.elapsed.total_seconds())
-        if r.status_code==400:
-            d.update({ip:int(r.elapsed.total_seconds()*1000)})
-            with open("tested-ip.txt",'a') as f:
-                f.write(f"{ip},{int(r.elapsed.total_seconds()*1000)}\n")
-    except:
-        pass
-with open("test-ip.txt",'w') as f:
-    for i in sorted(d.items(), key=operator.itemgetter(1)):
-        print(f"{i[0]},{i[1]}ms")
-        f.write(f"{i[0]},{i[1]}ms\n")
+
+def test_ip():
+    session = requests.Session()
+    ip_dict = {}
+
+    with open("ips.txt", "r") as ip_file:
+
+        for ip in ip_file.readlines():
+            ip = ip.strip()
+
+            try:
+                result = session.get(
+                    f"http://{ip}/ray", headers={"Host": "localhoster.ml"}, timeout=0.4)
+
+                # print(
+                #     f"{ip}, Status-Code: {result.status_code}, Elapsed-Time: {result.elapsed.total_seconds()}")
+
+                if result.status_code == 400:
+                    ip_dict.update({ip: int(result.elapsed.total_seconds()*1000)})
+                    with open("tested-ip.txt", 'a') as f:
+                        f.write(
+                            f"{ip} Latency: {int(result.elapsed.total_seconds()*1000)}\n")
+            # Interrupt by User
+            except KeyboardInterrupt:
+                print("Interrupted!")
+                sys.exit()
+            # Any other Error Will be Ignored
+            except:
+                pass
+
+    return ip_dict
+
+
+def Sort_late_time():
+    d = test_ip()
+    with open("Sorted-IP.txt", 'w') as sorted_file:
+
+        for i in sorted(d.items(), key=operator.itemgetter(1)):
+            sorted_file.write(f"{i[0]} -- Latency:{i[1]}ms\n")
+
+def The_Best_Ips():
+    print("\nThe 10 Best IP (Lower Latency)\n")
+    os.system("bash -c 'head Sorted-IP.txt'")
+    print()
+
+Sort_late_time()
+The_Best_Ips()
