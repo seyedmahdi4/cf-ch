@@ -17,8 +17,8 @@ def test_ip():
                 result = session.get(
                     f"http://{ip}/ray", headers={"Host": "localhoster.ml"}, timeout=0.4)
 
-                # print(
-                #     f"{ip}, Status-Code: {result.status_code}, Elapsed-Time: {result.elapsed.total_seconds()}")
+                print(
+                    f"{ip}, Status-Code: {result.status_code}, Elapsed-Time: {result.elapsed.total_seconds()}")
 
                 if result.status_code == 400:
                     ip_dict.update({ip: int(result.elapsed.total_seconds()*1000)})
