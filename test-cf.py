@@ -3,7 +3,9 @@ import sys
 import operator
 import requests
 
-
+timeout=1
+ok = "\033[1;32mok\033[0m"
+bad = "\033[1;31mbad\033[0m"
 def test_ip():
     session = requests.Session()
     ip_dict = {}
@@ -15,10 +17,10 @@ def test_ip():
 
             try:
                 result = session.get(
-                    f"http://{ip}/ray", headers={"Host": "localhoster.ml"}, timeout=0.4)
+                    f"http://{ip}/ray", headers={"Host": "localhoster.ml"}, timeout=timeout)
 
                 print(
-                    f"{ip}, Status-Code: {result.status_code}, Elapsed-Time: {result.elapsed.total_seconds()}")
+                    f"{ip}, Status: {ok if result.status_code == 400 else bad}, Elapsed-Time: {result.elapsed.total_seconds()}")
 
                 if result.status_code == 400:
                     ip_dict.update({ip: int(result.elapsed.total_seconds()*1000)})
@@ -31,7 +33,7 @@ def test_ip():
                 sys.exit()
             # Any other Error Will be Ignored
             except:
-                pass
+                print(f"IP {ip} filtered or bad ping!")
 
     return ip_dict
 
