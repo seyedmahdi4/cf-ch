@@ -11,6 +11,7 @@ bad = "\033[1;31mbad\033[0m"
 filtered = "\033[1;35mfiltered\033[0m"
 bad_ping = "\033[1;35mbad ping\033[0m"
 
+
 def test_ip():
     session = requests.Session()
     ip_dict = {}
@@ -23,14 +24,14 @@ def test_ip():
     for ip in ips:
         try:
             result = session.get(
-                f"http://{ip}/ray", headers={"Host": "localhoster.ml"}, timeout=timeout)
+                f"http://{ip}/{os.environ.get('CF_PATH')}", headers={"Host": os.environ.get('CF_HOST')} or "localhoster.ml", timeout=timeout)
 
             print(
                 f"{ip}, Status: {ok if result.status_code == 400 else bad}, Elapsed-Time: {result.elapsed.total_seconds()}")
 
             if result.status_code == 400:
                 ip_dict.update({ip: int(result.elapsed.total_seconds()*1000)})
-                with open("tested-ip.txt", 'a') as f:
+                with open("/tmp/tested-ip.txt", 'a') as f:
                     f.write(
                         f"{ip} Latency: {int(result.elapsed.total_seconds()*1000)}\n")
         # Interrupt by User
@@ -45,7 +46,7 @@ def test_ip():
 
 def Sort_late_time():
     d = test_ip()
-    with open("Sorted-IP.txt", 'w') as sorted_file:
+    with open("/tmp/Sorted-IP.txt", 'w') as sorted_file:
 
         for i in sorted(d.items(), key=operator.itemgetter(1)):
             sorted_file.write(f"{i[0]} -- Latency:{i[1]}ms\n")
@@ -53,9 +54,11 @@ def Sort_late_time():
 
 def The_Best_Ips():
     print("\nThe 10 Best IP (Lower Latency)\n")
-    os.system("bash -c 'head Sorted-IP.txt'")
+    os.system("bash -c 'head /tmp/Sorted-IP.txt'")
     print()
 
 
 Sort_late_time()
 The_Best_Ips()
+if os.environ.get('FOR_PAAS'):
+    os.system("tail -f")
