@@ -24,7 +24,7 @@ def test_ip():
     for ip in ips:
         try:
             result = session.get(
-                f"http://{ip}/{os.environ.get('CF_PATH')}", headers={"Host": os.environ.get('CF_HOST')} or "localhoster.ml", timeout=timeout)
+                f"http://{ip}/{os.environ.get('CF_PATH', '')}", headers={"Host": os.environ.get('CF_HOST')}, timeout=timeout)
 
             print(
                 f"{ip}, Status: {ok if result.status_code == 400 else bad}, Elapsed-Time: {result.elapsed.total_seconds()}")
@@ -60,5 +60,5 @@ def The_Best_Ips():
 
 Sort_late_time()
 The_Best_Ips()
-if os.environ.get('FOR_PAAS'):
+if os.environ.get('FOR_PASS') is True:
     os.system("tail -f")
