@@ -10,6 +10,8 @@ ok = "\033[1;32mok\033[0m"
 bad = "\033[1;31mbad\033[0m"
 filtered = "\033[1;35mfiltered\033[0m"
 bad_ping = "\033[1;35mbad ping\033[0m"
+cfHost = os.environ.get('CF_HOST')
+cfPath = os.environ.get('CF_PATH', '')
 
 
 def test_ip():
@@ -24,7 +26,7 @@ def test_ip():
     for ip in ips:
         try:
             result = session.get(
-                f"http://{ip}/{os.environ.get('CF_PATH', '')}", headers={"Host": os.environ.get('CF_HOST')}, timeout=timeout)
+                f"http://{ip}/{cfPath}", headers={"Host": cfHost}, timeout=timeout)
 
             print(
                 f"{ip}, Status: {ok if result.status_code == 400 else bad}, Elapsed-Time: {result.elapsed.total_seconds()}")
