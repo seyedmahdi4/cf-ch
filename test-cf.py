@@ -12,7 +12,7 @@ n_test = 2
 timeout = 0.7
 path = "/"
 host = "www.cloudflare.com"
-shuffle = Truu
+shuffle = True
 
 
 def test_ip(ip):
